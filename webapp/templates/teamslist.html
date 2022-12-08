@@ -1,0 +1,36 @@
+<html>
+<div class="sideblock pt-0">
+    <span style="font-size:25px;cursor:pointer;display:none" id="open_sidebar">&#9776;</span>
+        <div class="tabletopbar">
+            <h2>Teams</h2>
+            <a href="add-team"><i class="bi bi-plus" style=""></i></a>
+        </div>
+        <table id="tableID" class="cell-border row-border stripe">
+            <thead>
+                <tr>
+                    <td>Name</td>
+                    <td>Location</td>
+                    <td>Department</td>
+                    <td>Team Lead</td>
+                    <td>Status</td>
+                    <td></td>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for team in teams_list %}
+                <tr>
+                    <td>{{ team.name }}</td>
+                    <td>{{ team.location }}</td>
+                    <td>{{ team.dep }}</td>
+                    <td>{{ team.team_lead }}</td>
+                    <td>{{ team.status }}</td>
+                    <td>
+                        <a href="edit-team{{ team.id }}" id="{{ team.id }}"><i class="fa fa-edit"></i></a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</html>

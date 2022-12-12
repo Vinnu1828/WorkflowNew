@@ -1,0 +1,127 @@
+<html>
+<style>
+    .card-body{
+        background-color: #1F5CAB;
+        color: white;
+    }
+    .num{
+        float: right;
+    }
+</style>
+<div class="sideblock pt-0">
+    <span style="font-size:25px;cursor:pointer;display:none" id="open_sidebar">&#9776;</span>
+    <div class="tabletopbar">
+        <h2>Verification Requests</h2>
+    </div>
+    <div class="row ml-1 mr-1 mt-3 mb-3">
+        <span class="input-group input-group-outline" style="width:22%"><span class="mt-2">From  </span><input type="date" id="from_date" class="form-control request_from" style="background-color: #ffffff;margin-left:3%;" value="{{ fromdate}}"></span>
+        <span class="input-group input-group-outline" style="width:22%;"><span class="mt-2">To  </span><input type="date" id="to_date" class="form-control request_to" style="background-color: #ffffff;margin-left:3%;" value="{{ todate}}"></span>
+        <span class="input-group input-group-outline" style="width:22%;"><span class="mt-2">Status  </span><select id="status" class="form-control request_status" style="background-color: #ffffff;margin-left:3%;">
+            <option disabled selected></option>
+            <option value="P" {% if status == 'P' %} selected {% endif %}>Pending</option>
+            <option value="I" {% if status == 'I' %} selected {% endif %}>In-Progress</option>
+            <option value="C" {% if status == 'C' %} selected {% endif %}>Completed</option>
+        </select>
+        </span>
+    </div>
+    <div class="row ml-5 mr-5">
+        <div class="col-sm-4">
+            <div class="card">
+                <div class="card-body">
+                    <span>Agricultural</span>
+                    <span class="num">{{ agriculture }}</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-4">
+            <div class="card">
+                <div class="card-body">
+                    <span>Residential</span>
+                    <span class="num">{{ residential }}</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-4">
+            <div class="card">
+                <div class="card-body">
+                    <span>Commercial</span>
+                    <span class="num">{{ commercial }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+        <table id="tableID" class="cell-border row-border stripe">
+            <thead>
+                <tr>
+                    <td>Request-ID</td>
+                    <td>Type</td>
+                    <td>Date</td>
+                    <td>Requester</td>
+                    <td>Mobile</td>
+                    <td>Status</td>
+                    <td></td>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for req in requests_list %}
+                <tr>
+                    <td>{{ req.req_id }}</td>
+                    <td>{{ req.type }}</td>
+                    <td>{{ req.date }}</td>
+                    <td>{{ req.requester }}</td>
+                    <td>{{ req.mobile }}</td>
+                    <td>{{ req.status }}</td>
+                    <td>
+                        <a href="verification_request/{{ req.req_id }}" ><i class="fa fa-eye" aria-hidden="true"></i> View</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</html>
+<script>
+    $('#from_date').change(function(){
+        if(window.location.href.indexOf("from_date") > -1){
+            var currentUrl = window.location.href;
+            var url = new URL(currentUrl);
+            url.searchParams.set("from_date", $(this).val()); // setting your param
+            path = window.location.href.split('?')[0]
+            window.location.href = url.href
+        }else if(window.location.href.indexOf("?") > -1){
+            params = "&from_date=" + $(this).val()
+        }else{
+            params = "?from_date=" + $(this).val()
+        }
+        window.location.href = window.location.href + params
+    });
+    $('#to_date').change(function(){
+        if(window.location.href.indexOf("to_date") > -1){
+            var currentUrl = window.location.href;
+            var url = new URL(currentUrl);
+            url.searchParams.set("to_date", $(this).val()); // setting your param
+            path = window.location.href.split('?')[0]
+            window.location.href = url.href
+        }else if(window.location.href.indexOf("?") > -1){
+            params = "&to_date=" + $(this).val()
+        }else{
+            params = "?to_date=" + $(this).val()
+        }
+        window.location.href = window.location.href + params
+    });
+    $('#status').change(function(){
+        if(window.location.href.indexOf("status") > -1){
+            var currentUrl = window.location.href;
+            var url = new URL(currentUrl);
+            url.searchParams.set("status", $(this).val()); // setting your param
+            path = window.location.href.split('?')[0]
+            window.location.href = url.href
+        }else if(window.location.href.indexOf("?") > -1){
+            params = "&status=" + $(this).val()
+        }else{
+            params = "?status=" + $(this).val()
+        }
+        window.location.href = window.location.href + params
+    });
+</script>

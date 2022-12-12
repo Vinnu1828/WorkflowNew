@@ -171,6 +171,7 @@ class Request(models.Model):
     requesteridentitynumber = models.CharField(max_length=45, null=True)
     agentcode = models.CharField(max_length=15, null=True)
     requeststatus = models.CharField(max_length=1, null=True)
+    requestdate = models.DateTimeField(null=True)
 
     class Meta:
         db_table = 'request'
@@ -355,3 +356,49 @@ class LegalCase(models.Model):
 
     class Meta:
         db_table = 'legalcase'
+
+
+class FieldPartnerManager(models.Model):
+    id = models.AutoField(primary_key=True)
+    requestid = models.IntegerField()
+    name = models.CharField(max_length=100)
+    mobile = models.CharField(max_length=15)
+    email = models.CharField(max_length=100)
+    location = models.CharField(max_length=50)
+    address1 = models.CharField(max_length=100)
+    address2 = models.CharField(max_length=100, null=True)
+    city = models.CharField(max_length=50, null=True)
+    state = models.CharField(max_length=50, null=True)
+    type = models.CharField(max_length=1)
+    status = models.CharField(max_length=1)
+
+    class Meta:
+        db_table = 'fieldpartnermanager'
+
+
+class PropertyOwner(models.Model):
+    id = models.AutoField(primary_key=True)
+    requestid = models.IntegerField()
+    ownername = models.CharField(max_length=100, null=True)
+    kathanumber = models.CharField(max_length=100, null=True)
+    dharinipassbooknumber = models.CharField(max_length=100, null=True)
+    aadharnumber = models.CharField(max_length=4, null=True)
+    ownserssowodoname = models.CharField(max_length=100, null=True)
+    ownermobilenumber = models.CharField(max_length=15, null=True)
+    ownermobilestatus = models.CharField(max_length=1, null=True)
+
+    class Meta:
+        db_table = 'propertyowner'
+
+
+class RequestPayment(models.Model):
+    id = models.AutoField(primary_key=True)
+    requestid = models.IntegerField()
+    paymentdate = models.DateTimeField(null=True)
+    paymentmode = models.CharField(max_length=40, null=True)
+    paymentreference = models.CharField(max_length=100, null=True)
+    amountpaid = models.DecimalField(max_digits=13, decimal_places=2)
+    status = models.CharField(max_length=1, null=True)
+
+    class Meta:
+        db_table = 'requestpayment'

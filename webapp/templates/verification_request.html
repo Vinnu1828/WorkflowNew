@@ -1,0 +1,254 @@
+<html>
+<style>
+    table.dataTable thead td {
+        background-color: #1F5CAB;
+        color: white;
+    }
+    table.dataTable.stripe tbody tr.odd, table.dataTable.display tbody tr.odd {
+        background-color: #f1f1f3 !important;
+    }
+    .new_table th,.new_table td{
+        border: 1px solid white;
+        padding: 9px;
+    }
+</style>
+<div class="sideblock pt-0">
+    <span style="font-size:25px;cursor:pointer;display:none" id="open_sidebar">&#9776;</span>
+    <div class="tabletopbar">
+        <h2>Verification Request # {{ request_obj.id }}</h2>
+    </div>
+        <table id="verification" class="cell-border row-border stripe mt-5 mb-4">
+            <thead>
+                <tr>
+                    <td>Date</td>
+                    <td>Preliminary</td>
+                    <td>Revenue</td>
+                    <td>Survey</td>
+                    <td>Legal</td>
+                </tr>
+            </thead>
+
+            <tbody>
+                <tr>
+                    <td>{{ request_obj.date }}</td>
+                    <td>{{ request_obj.preliminary }}</td>
+                    <td>{{ request_obj.revenue }}</td>
+                    <td>{{ request_obj.survey }}</td>
+                    <td>{{ request_obj.legal }}</td>
+                </tr>
+            </tbody>
+        </table>
+
+    <div class="mb-2 mt-2 mr-5" style="background: #f1f1f3;height: 40px;text-align:center;justify-content: center;align-items: center;display:flex;background-color: #1F5CAB;color: white;width:95%;">
+        <p><b id="title_text">Application Details</b></p>
+    </div>
+    <div class="details">
+        <br>
+        <div class="left">
+            <div class="leftdiv" style="color: #1F5CAB;" onclick="openPage(this,'applicant')"><p><b>Application Details</b></p></div>
+            <div class="leftdiv" onclick="openPage(this,'owner')"><p><b>Owner Details</b></p></div>
+            <div class="leftdiv" onclick="openPage(this,'property')"><p><b>Property Details</b></p></div>
+            <div class="leftdiv" onclick="openPage(this,'legal')"><p><b>Legal Cases</b></p></div>
+            <div class="leftdiv" onclick="openPage(this,'payment')"><p><b>Payment Details</b></p></div>
+            <div class="leftdiv" onclick="openPage(this,'survey')"><p><b>Payment Schedule</b></p></div>
+        </div>
+        <div class="Right">
+            <div class="inner_page" id="applicant">
+                <table class="new_table" style="width:100%;background-color: #D0DEEF !important;">
+              <tr>
+                <th>Requester Name:</th>
+                <td>{{ request_obj.requestername }}</td>
+              </tr>
+              <tr>
+                <th>Mobile Number:</th>
+                <td>{{ request_obj.mobile }}</td>
+              </tr>
+              <tr>
+                <th>Email Address:</th>
+                <td>{{ request_obj.email }}</td>
+              </tr>
+              <tr>
+                <th>Identity:</th>
+                <td>{{ request_obj.identity }} ({{ request_obj.identitytype }})</td>
+              </tr>
+              <tr>
+                <th>Field Partner:</th>
+                <td>{{ request_obj.field_partner }}</td>
+              </tr>
+              <tr>
+                <th>Address:</th>
+                <td>{{ request_obj.address }}</td>
+              </tr>
+              <tr>
+                <th>City:</th>
+                <td>{{ request_obj.city }}</td>
+              </tr>
+              <tr>
+                <th>State:</th>
+                <td>{{ request_obj.state }}</td>
+              </tr>
+              <tr>
+                <th>Pincode:</th>
+                <td>{{ request_obj.pincode }}</td>
+              </tr>
+              <tr>
+                <th>Country:</th>
+                <td>{{ request_obj.country }}</td>
+              </tr>
+            </table>
+            </div>
+            <div class="inner_page" id="owner" hidden>
+                <table class="new_table" style="width:100%;background-color: #D0DEEF !important;">
+              <tr>
+                <th>Name of Pattadhar(Owner):</th>
+                <td>{{ request_obj.pattadar }}</td>
+              </tr>
+              <tr>
+                <th>Son/Do/Wo:</th>
+                <td>{{ request_obj.sonwodo }}</td>
+              </tr>
+              <tr>
+                <th>Mobile Number:</th>
+                <td>{{ request_obj.pattadar_mobile }}</td>
+              </tr>
+              <tr>
+                <th>Email Address:</th>
+                <td></td>
+              </tr>
+              <tr>
+                <th>Aadhar (first 4 digits):</th>
+                <td>{{ request_obj.aadhar }}</td>
+              </tr>
+              <tr>
+                <th>Dharani Passbook No:</th>
+                <td>{{ request_obj.pattadar_pass }}</td>
+              </tr>
+              <tr>
+                <th>Dharani Passbook first page:</th>
+                <td></td>
+              </tr>
+            </table>
+            </div>
+            <div class="inner_page" id="property" hidden>
+                <table class="new_table" style="width:100%;background-color: #D0DEEF !important;">
+              <tr>
+                <th>Location:</th>
+                <td>{{ request_obj.location }}</td>
+              </tr>
+              <tr>
+                <th>Revenue Village:</th>
+                <td>{{ request_obj.revenue_village }}</td>
+              </tr>
+              <tr>
+                <th>Mandal:</th>
+                <td>{{ request_obj.mandal }}</td>
+              </tr>
+              <tr>
+                <th>District:</th>
+                <td>{{ request_obj.district }}</td>
+              </tr>
+              <tr>
+                <th>Property Located In:</th>
+                <td>{{ request_obj.located_in }}</td>
+              </tr>
+              <tr>
+                <th>Latest Sale Deed No:</th>
+                <td>{{ request_obj.saledeed_no }}</td>
+              </tr>
+              <tr>
+                <th>Year of Registration:</th>
+                <td>{{ request_obj.year }}</td>
+              </tr>
+              <tr>
+                <th>Place of Registration (SRO):</th>
+                <td>{{ request_obj.reg_place }}</td>
+              </tr>
+
+            </table>
+            </div>
+            <div class="inner_page" id="legal" hidden>
+                <table class="new_table" style="width:100%;background-color: #D0DEEF !important;">
+              <tr>
+                <th>Case No</th>
+                <th>Court Name</th>
+                <th>Petitioner</th>
+                <th>Defendant</th>
+                <th>Status</th>
+                <th>Order</th>
+              </tr>
+                    {% for case in request_obj.legal_cases %}
+              <tr>
+                <td>{{ case.casenumber }}</td>
+                <td>{{ case.courtname }}</td>
+                <td>{{ case.petitioners }}</td>
+                <td>{{ case.defendants }}</td>
+                <td>
+                    {% if case.casestatus == 'D' %}
+                    Disposed
+                    {% else %}
+                    Pending
+                    {% endif %}
+                </td>
+                <td>{{ case.ordernumber }}</td>
+              </tr>
+                    {% endfor %}
+            </table>
+                <p class="pt-3">Is Owner in possession of the property ? {{ request_obj.position }}</p>
+            </div>
+            <div class="inner_page" id="payment" hidden>
+                <table class="new_table" style="width:100%;background-color: #D0DEEF !important;">
+              <tr>
+                <th>Date Paid:</th>
+                <td>Bill Gates</td>
+              </tr>
+              <tr>
+                <th>Amount Paid:</th>
+                <td>555 77 854</td>
+              </tr>
+              <tr>
+                <th>Service Type:</th>
+                <td>555 77 855</td>
+              </tr>
+              <tr>
+                <th>Mod of Payment:</th>
+                <td>555 77 855</td>
+              </tr>
+              <tr>
+                <th>Payment Reference No:</th>
+                <td>555 77 855</td>
+              </tr>
+            </table>
+            </div>
+            <div class="inner_page" id="survey" hidden>
+                <table class="new_table" style="width:100%;background-color: #D0DEEF !important;">
+              <tr>
+                <th>Date & Time:</th>
+                <td>Bill Gates</td>
+              </tr>
+              <tr>
+                <th>Location:</th>
+                <td>555 77 854</td>
+              </tr>
+            </table>
+            </div>
+        </div>
+    </div>
+
+    </div>
+<script>
+    $('#verification').dataTable({
+        "searching": false,
+        "ordering": false,
+        "paging": false,
+        "info": false,
+        "lengthChange": false
+    });
+    function openPage(e, id){
+        $('.inner_page').attr('hidden', true)
+        $('#'+id).attr('hidden', false)
+        $('.leftdiv').css('color', 'black')
+        $('.leftdiv').css('color', 'black')
+        $(e).css('color', '#1F5CAB')
+        $('#title_text').html($(e).children('p').children('b').html())
+    }
+</script>

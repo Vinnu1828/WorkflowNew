@@ -170,6 +170,7 @@ class Request(models.Model):
     requesteridentitytype = models.CharField(max_length=1, null=True)
     requesteridentitynumber = models.CharField(max_length=45, null=True)
     agentcode = models.CharField(max_length=15, null=True)
+    requestcode = models.CharField(max_length=11, null=True)
     requeststatus = models.CharField(max_length=1, null=True)
     requestdate = models.DateTimeField(null=True)
 
@@ -380,6 +381,7 @@ class PropertyOwner(models.Model):
     id = models.AutoField(primary_key=True)
     requestid = models.IntegerField()
     ownername = models.CharField(max_length=100, null=True)
+    owneremail = models.CharField(max_length=100, null=True)
     kathanumber = models.CharField(max_length=100, null=True)
     dharinipassbooknumber = models.CharField(max_length=100, null=True)
     aadharnumber = models.CharField(max_length=4, null=True)

@@ -11,7 +11,7 @@
 <div class="sideblock pt-0">
     <span style="font-size:25px;cursor:pointer;display:none" id="open_sidebar">&#9776;</span>
     <div class="tabletopbar">
-        <h2>Verification Requests</h2>
+        <h2>Preliminary Verification Requests</h2>
     </div>
     <div class="row ml-1 mr-1 mt-3 mb-3">
         <span class="input-group input-group-outline" style="width:22%"><span class="mt-2">From  </span><input type="date" id="from_date" class="form-control request_from" style="background-color: #ffffff;margin-left:3%;" value="{{ fromdate}}"></span>
@@ -65,7 +65,7 @@
 
             <tbody>
                 {% for req in requests_list %}
-                <tr onclick="location.href = 'verification_request/{{ req.req_id }}';" style="cursor:pointer;">
+                <tr onclick="location.href = 'preliminary-verification/{{ req.req_id }}';" style="cursor:pointer;">
                     <td>{{ req.requestcode }}</td>
                     <td>{{ req.type }}</td>
                     <td>{{ req.date }}</td>

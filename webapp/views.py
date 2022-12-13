@@ -13,7 +13,8 @@ from rest_framework.decorators import api_view
 
 from workflowapp.models import Holiday, HolidayDepartment, Employee, Team, HolidayLocation, TeamMember, Department, \
     Task, Service, PropertyType, TaskActivity, Request, RequestProperty, PreliminaryTask, Dharani, ProhibitedLand, \
-    Encumbrance, LegalCase, Checklist, Checklistanswer, Urbanland, Preliminary, FieldPartnerManager, PropertyOwner
+    Encumbrance, LegalCase, Checklist, Checklistanswer, Urbanland, Preliminary, FieldPartnerManager, PropertyOwner, \
+    RequestPayment, Document
 from allauth.account import app_settings as allauth_settings
 
 
@@ -342,11 +343,22 @@ def requests(request):
         from_date = request.GET.get('from_date', None)
         to_date = request.GET.get('to_date', None)
         filter_status = request.GET.get('status', None)
+        filter_type = request.GET.get('type', None)
         requests_list = []
         agriculture = RequestProperty.objects.filter(propertytype__in=[1, 2]).count()
         residential = RequestProperty.objects.filter(propertytype__in=[3, 4, 5]).count()
         commercial = RequestProperty.objects.filter(propertytype__in=[6, 7]).count()
         request_data = Request.objects.all()
+        if filter_type:
+            if filter_type == 'A':
+                propertytype = [1, 2]
+            elif filter_type == 'R':
+                propertytype = [3, 4, 5]
+            else:
+                propertytype = [6, 7]
+            requestids = RequestProperty.objects.filter(propertytype__in=propertytype).values_list('requestid',
+                                                                                                   flat=True).distinct()
+            request_data = request_data.filter(id__in=list(requestids))
         if from_date:
             request_data = request_data.filter(requestdate__gte=from_date)
         if to_date:
@@ -363,6 +375,54 @@ def requests(request):
                    'requester': req.requestername, 'mobile': req.requestermobile, "status": status}
             requests_list.append(obj)
         return render(request, "sidebar.html", {"template_name": "requests.html", "requests_list": requests_list,
+                                                "agriculture": agriculture, "residential": residential,
+                                                "commercial": commercial, "fromdate": from_date, "todate": to_date,
+                                                "status": filter_status})
+    except Exception as e:
+        print(str(e))
+        return redirect('tasks')
+
+
+def preliminary_requests(request):
+    try:
+        if not request.user.is_active:
+            return redirect('login')
+        from_date = request.GET.get('from_date', None)
+        to_date = request.GET.get('to_date', None)
+        filter_status = request.GET.get('status', None)
+        filter_type = request.GET.get('type', None)
+        requests_list = []
+        agriculture = RequestProperty.objects.filter(propertytype__in=[1, 2]).count()
+        residential = RequestProperty.objects.filter(propertytype__in=[3, 4, 5]).count()
+        commercial = RequestProperty.objects.filter(propertytype__in=[6, 7]).count()
+        preliminary_reqs = Preliminary.objects.all().values_list('requestid', flat=True).distinct()
+        request_data = Request.objects.filter(id__in=list(preliminary_reqs))
+        if filter_type:
+            if filter_type == 'A':
+                propertytype = [1, 2]
+            elif filter_type == 'R':
+                propertytype = [3, 4, 5]
+            else:
+                propertytype = [6, 7]
+            requestids = RequestProperty.objects.filter(propertytype__in=propertytype).values_list('requestid',
+                                                                                                   flat=True).distinct()
+            request_data = request_data.filter(id__in=list(requestids))
+        if from_date:
+            request_data = request_data.filter(requestdate__gte=from_date)
+        if to_date:
+            request_data = request_data.filter(requestdate__lte=to_date)
+        if filter_status:
+            request_data = request_data.filter(requeststatus=filter_status)
+        for req in request_data:
+            request_property = RequestProperty.objects.get(requestid=req.id)
+            property_type = {'1': 'Agriculture Land', '2': 'Agriculture Farm House', '3': 'Residential Plot',
+                             '4': 'Residential Flats', '5': 'Residential Villas/Independent Houses',
+                             '6': 'Commercial/Industrial Open Spaces', '7': 'Commercial/Industrial Buildings'}
+            status = getstatus(req.requeststatus)
+            obj = {'req_id': req.id, 'type': property_type[request_property.propertytype], 'date': req.requestdate,
+                   'requester': req.requestername, 'mobile': req.requestermobile, "status": status}
+            requests_list.append(obj)
+        return render(request, "sidebar.html", {"template_name": "preliminary_requests.html", "requests_list": requests_list,
                                                 "agriculture": agriculture, "residential": residential,
                                                 "commercial": commercial, "fromdate": from_date, "todate": to_date,
                                                 "status": filter_status})
@@ -395,11 +455,20 @@ def verification_request(request, req_id):
             identitytype = "Passport"
         field_man = FieldPartnerManager.objects.filter(requestid=req_id).first()
         field_partner = f'{field_man.id} ({field_man.name}, {field_man.address1})' if field_man else None
-        pattadar = PropertyOwner.objects.get(requestid=req_id)
+        pattadars = PropertyOwner.objects.filter(requestid=req_id)
+        pattadar_data = []
+        for pattadar in pattadars:
+            pattadar_data.append({'pattadar': pattadar.ownername, 'sonwodo': pattadar.ownserssowodoname,
+                                  'pattadar_mobile': pattadar.ownermobilenumber, 'aadhar': pattadar.aadharnumber,
+                                  'pattadar_pass': pattadar.dharinipassbooknumber, 'email': pattadar.owneremail})
+        document = Document.objects.filter(requestid=req_id, task='D').first()
+        doc_exe = document.filename.split('.')[-1]
+        dharani_first_page = f"data:image/{doc_exe};base64,{base64.b64encode(document.filecontent).decode()}"
         property_details = RequestProperty.objects.get(requestid=req_id)
         legal_cases = LegalCase.objects.filter(requestid=req_id).values()
+        payment_req = RequestPayment.objects.filter(requestid=req_id).first()
         request_obj = {'date': request_data.requestdate, 'preliminary': getstatus(preliminary.status),
-                       'revenue': 'In-Progress', 'survey': 'Pending', 'legal': 'Completed', 'id': req_id,
+                       'revenue': 'In-Progress', 'survey': 'Pending', 'legal': 'Completed', 'id': request_data.requestcode,
                        'requestername': request_data.requestername, 'mobile': request_data.requestermobile,
                        'email': request_data.requesteremail, 'identitytype': identitytype,
                        'email_status': 'Verified' if request_data.requesteremailstatus else 'Pending for Verification',
@@ -407,14 +476,17 @@ def verification_request(request, req_id):
                        'address': f'{request_data.requesteraddressline1} {request_data.requesteraddressline2 if request_data.requesteraddressline2 else ""}',
                        'city': f'{request_data.requestercity}', 'state': f'{request_data.requesterstate}',
                        'pincode': request_data.requesterpin, 'country': request_data.requestercountry,
-                       'pattadar': pattadar.ownername, 'sonwodo': pattadar.ownserssowodoname,
-                       'pattadar_mobile': pattadar.ownermobilenumber, 'aadhar': pattadar.aadharnumber,
-                       'pattadar_pass': pattadar.dharinipassbooknumber, 'location': property_details.propertylocation,
-                       'revenue_village': property_details.propertyrevenuevillage, 'mandal': property_details.propertymandal,
+                       'pattadar_data': pattadar_data, 'location': property_details.propertylocation,
+                       'revenue_village': property_details.propertyrevenuevillage,
+                       'mandal': property_details.propertymandal,
                        'district': property_details.propertydistrict, 'located_in': property_details.locationgeotag,
                        'saledeed_no': property_details.latestsaledeedno, 'year': property_details.latestsaledeedyear,
                        'reg_place': property_details.latestsaledeedsro, 'legal_cases': list(legal_cases),
-                       'position': 'Yes' if property_details.ispattedharinposession == 'Y' else 'No'}
+                       'position': 'Yes' if property_details.ispattedharinposession == 'Y' else 'No',
+                       'dharani_first_page': dharani_first_page, 'paymentdate': payment_req.paymentdate,
+                       'paymentmode': payment_req.paymentmode, 'paymentreference': payment_req.paymentreference,
+                       'amountpaid': payment_req.amountpaid,
+                       'payment_status': 'Full payment' if payment_req.status == 'F' else 'Partial payment'}
         return render(request, "sidebar.html", {"template_name": "verification_request.html",
                                                 'request_obj': request_obj})
     except Exception as e:
@@ -502,7 +574,7 @@ def preliminary_verification(request, req_id):
         property_type = {'1': 'Agriculture Land', '2': 'Agriculture Farm House', '3': 'Residential Plot',
                          '4': 'Residential Flats', '5': 'Residential Villas/Independent Houses',
                          '6': 'Commercial/Industrial Open Spaces', '7': 'Commercial/Industrial Buildings'}
-        obj = {'id': requestdb.id, 'name': requestdb.requestername, 'num': requestdb.requestermobile,
+        obj = {'id': requestdb.requestcode, 'name': requestdb.requestername, 'num': requestdb.requestermobile,
                'status': requestdb.requeststatus, 'service_type': service_type.name,
                'property_type': property_type[request_property.propertytype]}
         request_details = PreliminaryTask.objects.filter(requestid=requestdb.id)
@@ -551,7 +623,7 @@ def dharani_details_entry(request, task_id):
         property_type = {'1': 'Agriculture Land', '2': 'Agriculture Farm House', '3': 'Residential Plot',
                          '4': 'Residential Flats', '5': 'Residential Villas/Independent Houses',
                          '6': 'Commercial/Industrial Open Spaces', '7': 'Commercial/Industrial Buildings'}
-        obj = {'id': requestdb.id, 'name': requestdb.requestername, 'num': requestdb.requestermobile,
+        obj = {'id': requestdb.id, 'requestcode': requestdb.requestcode, 'name': requestdb.requestername, 'num': requestdb.requestermobile,
                'status': requestdb.requeststatus, 'service_type': service_type.name,
                'property_type': property_type[request_property.propertytype], 'task_id': task_details.id,
                'task_status': task_details.status, 'notes': task_details.notes if task_details.notes else '',
@@ -588,7 +660,8 @@ def prohibited_details_entry(request, task_id):
         property_type = {'1': 'Agriculture Land', '2': 'Agriculture Farm House', '3': 'Residential Plot',
                          '4': 'Residential Flats', '5': 'Residential Villas/Independent Houses',
                          '6': 'Commercial/Industrial Open Spaces', '7': 'Commercial/Industrial Buildings'}
-        obj = {'id': requestdb.id, 'name': requestdb.requestername, 'num': requestdb.requestermobile,
+        obj = {'id': requestdb.id, 'requestcode': requestdb.requestcode, 'name': requestdb.requestername,
+               'num': requestdb.requestermobile,
                'status': requestdb.requeststatus, 'service_type': service_type.name,
                'property_type': property_type[request_property.propertytype], 'task_id': task_details.id,
                'task_status': task_details.status, 'notes': task_details.notes if task_details.notes else '',
@@ -631,7 +704,8 @@ def encumbrance_details_entry(request, task_id):
         if checklistquesn:
             checklist.update(
                 {'answer': checklistans.answer if checklistans else None, 'question': checklistquesn.question})
-        obj = {'id': requestdb.id, 'name': requestdb.requestername, 'num': requestdb.requestermobile,
+        obj = {'id': requestdb.id, 'requestcode': requestdb.requestcode, 'name': requestdb.requestername,
+               'num': requestdb.requestermobile,
                'status': requestdb.requeststatus, 'service_type': service_type.name,
                'property_type': property_type[request_property.propertytype], 'task_id': task_details.id,
                'task_status': task_details.status, 'notes': task_details.notes if task_details.notes else '',
@@ -668,7 +742,7 @@ def urbanland_details_entry(request, task_id):
         property_type = {'1': 'Agriculture Land', '2': 'Agriculture Farm House', '3': 'Residential Plot',
                          '4': 'Residential Flats', '5': 'Residential Villas/Independent Houses',
                          '6': 'Commercial/Industrial Open Spaces', '7': 'Commercial/Industrial Buildings'}
-        obj = {'id': requestdb.id, 'name': requestdb.requestername, 'num': requestdb.requestermobile,
+        obj = {'id': requestdb.id, 'requestcode': requestdb.requestcode, 'name': requestdb.requestername, 'num': requestdb.requestermobile,
                'status': requestdb.requeststatus, 'service_type': service_type.name,
                'property_type': property_type[request_property.propertytype], 'task_id': task_details.id,
                'task_status': task_details.status, 'notes': task_details.notes if task_details.notes else '',
@@ -709,7 +783,8 @@ def legalcase_details_entry(request, task_id):
         if checklistquesn:
             checklist.update(
                 {'answer': checklistans.answer if checklistans else None, 'question': checklistquesn.question})
-        obj = {'id': requestdb.id, 'name': requestdb.requestername, 'num': requestdb.requestermobile,
+        obj = {'id': requestdb.id, 'requestcode': requestdb.requestcode, 'name': requestdb.requestername,
+               'num': requestdb.requestermobile,
                'status': requestdb.requeststatus, 'service_type': service_type.name,
                'property_type': property_type[request_property.propertytype], 'task_id': task_details.id,
                'task_status': task_details.status, 'notes': task_details.notes if task_details.notes else '',

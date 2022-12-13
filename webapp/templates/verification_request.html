@@ -11,6 +11,9 @@
         border: 1px solid white;
         padding: 9px;
     }
+    th{
+        width: 30%;
+    }
 </style>
 <div class="sideblock pt-0">
     <span style="font-size:25px;cursor:pointer;display:none" id="open_sidebar">&#9776;</span>
@@ -50,7 +53,7 @@
             <div class="leftdiv" onclick="openPage(this,'property')"><p><b>Property Details</b></p></div>
             <div class="leftdiv" onclick="openPage(this,'legal')"><p><b>Legal Cases</b></p></div>
             <div class="leftdiv" onclick="openPage(this,'payment')"><p><b>Payment Details</b></p></div>
-            <div class="leftdiv" onclick="openPage(this,'survey')"><p><b>Payment Schedule</b></p></div>
+            <div class="leftdiv" onclick="openPage(this,'survey')"><p><b>Survey Schedule</b></p></div>
         </div>
         <div class="Right">
             <div class="inner_page" id="applicant">
@@ -97,38 +100,40 @@
               </tr>
             </table>
             </div>
+            {% for pattadar in request_obj.pattadar_data %}
             <div class="inner_page" id="owner" hidden>
                 <table class="new_table" style="width:100%;background-color: #D0DEEF !important;">
               <tr>
                 <th>Name of Pattadhar(Owner):</th>
-                <td>{{ request_obj.pattadar }}</td>
+                <td>{{ pattadar.pattadar }}</td>
               </tr>
               <tr>
                 <th>Son/Do/Wo:</th>
-                <td>{{ request_obj.sonwodo }}</td>
+                <td>{{ pattadar.sonwodo }}</td>
               </tr>
               <tr>
                 <th>Mobile Number:</th>
-                <td>{{ request_obj.pattadar_mobile }}</td>
+                <td>{{ pattadar.pattadar_mobile }}</td>
               </tr>
               <tr>
                 <th>Email Address:</th>
-                <td></td>
+                <td>{{ pattadar.email }}</td>
               </tr>
               <tr>
                 <th>Aadhar (first 4 digits):</th>
-                <td>{{ request_obj.aadhar }}</td>
+                <td>{{ pattadar.aadhar }}</td>
               </tr>
               <tr>
                 <th>Dharani Passbook No:</th>
-                <td>{{ request_obj.pattadar_pass }}</td>
+                <td>{{ pattadar.pattadar_pass }}</td>
               </tr>
               <tr>
                 <th>Dharani Passbook first page:</th>
-                <td></td>
+                <td><img src="{{ request_obj.dharani_first_page }}" width="350px" height="200px"></td>
               </tr>
             </table>
             </div>
+            {% endfor %}
             <div class="inner_page" id="property" hidden>
                 <table class="new_table" style="width:100%;background-color: #D0DEEF !important;">
               <tr>
@@ -199,23 +204,23 @@
                 <table class="new_table" style="width:100%;background-color: #D0DEEF !important;">
               <tr>
                 <th>Date Paid:</th>
-                <td>Bill Gates</td>
+                <td>{{ request_obj.paymentdate }}</td>
               </tr>
               <tr>
                 <th>Amount Paid:</th>
-                <td>555 77 854</td>
+                <td>{{ request_obj.paymentmode }}</td>
               </tr>
               <tr>
                 <th>Service Type:</th>
-                <td>555 77 855</td>
+                <td>{{ request_obj.paymentreference }}</td>
               </tr>
               <tr>
                 <th>Mod of Payment:</th>
-                <td>555 77 855</td>
+                <td>{{ request_obj.amountpaid }}</td>
               </tr>
               <tr>
                 <th>Payment Reference No:</th>
-                <td>555 77 855</td>
+                <td>{{ request_obj.payment_status }}</td>
               </tr>
             </table>
             </div>

@@ -15,6 +15,7 @@ urlpatterns = [
     path('edit-team<int:team_id>', views.edit_team, name='edit_team'),
     path('tasks', views.tasks, name='tasks'),
     path('requests', views.requests, name='requests'),
+    path('preliminaryrequests', views.preliminary_requests, name='preliminaryrequests'),
     path('verification_request/<int:req_id>', views.verification_request, name='verification_request'),
     path('add-tasks', views.add_tasks, name='add_tasks'),
     path('preliminary-verification/<int:req_id>', views.preliminary_verification, name='preliminary_verification'),

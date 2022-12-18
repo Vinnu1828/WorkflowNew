@@ -14,7 +14,7 @@ from rest_framework.decorators import api_view
 from workflowapp.models import Holiday, HolidayDepartment, Employee, Team, HolidayLocation, TeamMember, Department, \
     Task, Service, PropertyType, TaskActivity, Request, RequestProperty, PreliminaryTask, Dharani, ProhibitedLand, \
     Encumbrance, LegalCase, Checklist, Checklistanswer, Urbanland, Preliminary, FieldPartnerManager, PropertyOwner, \
-    RequestPayment, Document
+    RequestPayment, Document, PropertySurvey, RequestSchedule
 from allauth.account import app_settings as allauth_settings
 
 
@@ -467,6 +467,14 @@ def verification_request(request, req_id):
         property_details = RequestProperty.objects.get(requestid=req_id)
         legal_cases = LegalCase.objects.filter(requestid=req_id).values()
         payment_req = RequestPayment.objects.filter(requestid=req_id).first()
+        land_details = PropertySurvey.objects.filter(requestid=req_id)
+        land_details_temp = []
+        total_extent = 0
+        for detail in land_details:
+            land_details_temp.append({'survey_no': detail.surveynumber, 'owner': detail.propertyowner,
+                                      'village': detail.surveyvillagename, 'surveyextent': detail.surveyextent})
+            total_extent += float(detail.surveyextent)
+        request_schedule = RequestSchedule.objects.filter(requestid=req_id).first()
         request_obj = {'date': request_data.requestdate, 'preliminary': getstatus(preliminary.status),
                        'revenue': 'In-Progress', 'survey': 'Pending', 'legal': 'Completed', 'id': request_data.requestcode,
                        'requestername': request_data.requestername, 'mobile': request_data.requestermobile,
@@ -485,8 +493,10 @@ def verification_request(request, req_id):
                        'position': 'Yes' if property_details.ispattedharinposession == 'Y' else 'No',
                        'dharani_first_page': dharani_first_page, 'paymentdate': payment_req.paymentdate,
                        'paymentmode': payment_req.paymentmode, 'paymentreference': payment_req.paymentreference,
-                       'amountpaid': payment_req.amountpaid,
-                       'payment_status': 'Full payment' if payment_req.status == 'F' else 'Partial payment'}
+                       'amountpaid': payment_req.amountpaid, 'total_extent': total_extent,
+                       'payment_status': 'Full payment' if payment_req.status == 'F' else 'Partial payment',
+                       'land_details_temp': land_details_temp, 'scheduled_date': request_schedule.scheduledt,
+                       'scheduled_loc': property_details.propertylocation}
         return render(request, "sidebar.html", {"template_name": "verification_request.html",
                                                 'request_obj': request_obj})
     except Exception as e:

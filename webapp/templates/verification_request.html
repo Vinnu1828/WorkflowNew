@@ -170,6 +170,35 @@
               </tr>
 
             </table>
+                <h2 class="mt-5">Land Details</h2>
+                <table class="new_table" style="width:100%;background-color: #D0DEEF !important;">
+              <tr>
+                <th>Survey No</th>
+                <th>Owner</th>
+                <th>Village</th>
+                <th>Extent in Acres</th>
+              </tr>
+                    {% for detail in request_obj.land_details_temp %}
+              <tr>
+                <td>{{ detail.survey_no }}</td>
+                <td>{{ detail.owner }}</td>
+                <td>{{ detail.village }}</td>
+                <td>{{ detail.surveyextent }}</td>
+              </tr>
+                    {% endfor %}
+              <tr>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+              </tr>
+              <tr>
+                <td></td>
+                <td></td>
+                <td>Total Extent</td>
+                <td>{{ request_obj.total_extent }}</td>
+              </tr>
+            </table>
             </div>
             <div class="inner_page" id="legal" hidden>
                 <table class="new_table" style="width:100%;background-color: #D0DEEF !important;">
@@ -228,11 +257,11 @@
                 <table class="new_table" style="width:100%;background-color: #D0DEEF !important;">
               <tr>
                 <th>Date & Time:</th>
-                <td>Bill Gates</td>
+                <td>{{ request_obj.scheduled_date }}</td>
               </tr>
               <tr>
                 <th>Location:</th>
-                <td>555 77 854</td>
+                <td>{{ request_obj.scheduled_loc }}</td>
               </tr>
             </table>
             </div>

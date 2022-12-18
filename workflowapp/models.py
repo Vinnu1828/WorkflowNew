@@ -404,3 +404,30 @@ class RequestPayment(models.Model):
 
     class Meta:
         db_table = 'requestpayment'
+
+
+class PropertySurvey(models.Model):
+    id = models.AutoField(primary_key=True)
+    requestid = models.IntegerField()
+    propertyowner = models.CharField(max_length=100, null=True)
+    requestpropertyid = models.IntegerField()
+    surveyslno = models.IntegerField()
+    surveyvillagename = models.CharField(max_length=100, null=True)
+    surveynumber = models.CharField(max_length=40, null=True)
+    surveyextent = models.DecimalField(max_digits=13, decimal_places=3)
+    units = models.CharField(max_length=40, null=True)
+    natureofland = models.CharField(max_length=100, null=True)
+    classifcationofland = models.CharField(max_length=100, null=True)
+
+    class Meta:
+        db_table = 'propertysurvey'
+
+
+class RequestSchedule(models.Model):
+    requestid = models.IntegerField(null=True)
+    scheduledt = models.DateField(null=True)
+    scheduletime = models.CharField(max_length=1, null=True)
+    type = models.CharField(max_length=1, null=True)
+
+    class Meta:
+        db_table = 'requestschedule'
